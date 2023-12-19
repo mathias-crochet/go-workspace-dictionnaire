@@ -15,8 +15,8 @@ func main() {
     fmt.Println("map:", m)
 
 	// get
-    a := get(m, "k1")
-	fmt.Println(a)
+    a := get(m, "a")
+	fmt.Println("valeur de 'a' :", a)
 
 	//list
 	list(m)
@@ -24,7 +24,7 @@ func main() {
 	//remove
 	remove(m, "c")
     fmt.Println("map sans 'c' :", m)
-	
+
 }
 
 func get(dictionnaire map[string]int, reference string) int {
