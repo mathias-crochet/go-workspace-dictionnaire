@@ -1,43 +1,24 @@
 package main
 
 import (
+	"dictionnaire/dictionary"
     "fmt"
 )
 
 func main() {
 
-    m := make(map[string]int)
+	d := dictionary.New()
 
-    m["a"] = 2
-    m["b"] = 4
-	m["c"] = 6
+	d.Add("etudiant", "mathias")
+	d.Add("ecole", "estiam")
+	d.Add("date", "19/12/2023")
 
-    fmt.Println("map:", m)
+	etu := d.Get("etudiant")
+	fmt.Println(etu)
 
-	// get
-    a := get(m, "a")
-	fmt.Println("valeur de 'a' :", a)
+	d.List()
 
-	//list
-	list(m)
+	d.Remove("ecole")
+	fmt.Println("dictionnaire sans 'ecole':", d)
 
-	//remove
-	remove(m, "c")
-    fmt.Println("map sans 'c' :", m)
-
-}
-
-func get(dictionnaire map[string]int, reference string) int {
-	return dictionnaire[reference]
-}
-
-func list(dictionnaire map[string]int) {
-	fmt.Println("Dictionnaire :")
-	for key, value := range dictionnaire {
-		fmt.Printf("%s: %d\n", key, value)
-	}
-}
-
-func remove(dictionnaire map[string]int, reference string) {
-	delete(dictionnaire, reference)
 }
