@@ -2,23 +2,24 @@ package main
 
 import (
 	"dictionnaire/dictionary"
-    "fmt"
 )
 
 func main() {
 
-	d := dictionary.New()
+	file := dictionary.NewFile("dictionary.json")
 
-	d.Add("etudiant", "mathias")
-	d.Add("ecole", "estiam")
-	d.Add("date", "19/12/2023")
+	langageGo := dictionary.NewDefinition("go", "langage de programmation compilé créé par Google")
+	estiam := dictionary.NewDefinition("estiam", "École supérieure des technologies de l’information appliquées aux métiers")
 
-	etu := d.Get("etudiant")
-	fmt.Println(etu)
+	dictionary.Add(langageGo, file)
+	dictionary.Add(estiam, file)
+	
+	dictionary.Get("go", file)
 
-	d.List()
+	dictionary.List(file)
 
-	d.Remove("ecole")
-	fmt.Println("dictionnaire sans 'ecole':", d)
+	dictionary.Remove("estiam", file)
+	dictionary.List(file)
+	
 
 }
