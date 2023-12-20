@@ -2,46 +2,19 @@ package main
 
 import (
 	"dictionnaire/dictionary"
-	"fmt"
+	"net/http"
 )
 
 func main() {
 
-	file := dictionary.NewFile("dictionary.json")
+	dictionary.NewFile("dictionary.json")
 
-	langageGo := dictionary.NewDefinition("go", "langage de programmation compilé créé par Google")
-	estiam := dictionary.NewDefinition("estiam", "École supérieure des technologies de l’information appliquées aux métiers")
+	http.HandleFunc("/add", dictionary.Add)
+	http.HandleFunc("/list", dictionary.List)
+	http.HandleFunc("/get", dictionary.Get)
+	http.HandleFunc("/remove", dictionary.Remove)
 
-	addChannel := make(chan string)
-	removeChannel := make(chan string)
+	http.ListenAndServe(":8080", nil)
 
-	go func()  {
-		dictionary.Add(langageGo, file)
-		addChannel <- "la définition a été ajoutée"
-	}()
-
-    fmt.Println(<-addChannel)
-
-	go func()  {
-		dictionary.Add(estiam, file)
-		addChannel <- "la définition a été ajoutée"
-	}()
-
-    fmt.Println(<-addChannel)
-
-	
-	go func()  {
-		dictionary.Remove("estiam", file)
-		removeChannel <- "la définition a été supprimé"
-	}()
-
-    fmt.Println(<-removeChannel)
-
-		
-	dictionary.Get("go", file)
-	dictionary.List(file)
-	
-	dictionary.List(file)
-	
 
 }

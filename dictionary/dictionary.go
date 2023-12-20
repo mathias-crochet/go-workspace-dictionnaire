@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"log"
+	"net/http"
 )
 
 type dictionary map[string]string
@@ -22,10 +23,17 @@ func NewDefinition(mot string, definition string) Definition {
 	return Definition{mot, definition}
 }
 
-func NewFile(fileName string) (*os.File) {
-	file, err := os.Create(fileName)
+func NewFile(fileName string) {
+	_, err := os.Create(fileName)
 	if err != nil {
 		log.Fatal("erreur lors de la création du fichier :", err) 
+	}
+}
+
+func GetFile(fileName string) *os.File {
+	file, err := os.OpenFile(fileName, os.O_RDWR, 0644)
+	if err != nil {
+		log.Fatal("erreur lors de l'ouverture du fichier :", err)
 	}
 	return file
 }
@@ -50,11 +58,19 @@ func GetFileData(file *os.File)  (dictionary) {
 	return dictionnaire
 }
 
-func Add(definition Definition, file *os.File) {
+// url: http://localhost:8080/add?mot=go&definition=langage%20de%20programmation%20compil%C3%A9%20cr%C3%A9%C3%A9%20par%20Google
+func Add(w http.ResponseWriter, req *http.Request) {
+
+	file := GetFile("dictionary.json")
 
 	dictionnaire := GetFileData(file)
 
-	dictionnaire[definition.Mot] = definition.Definition
+	mot := req.URL.Query().Get("mot")
+	definition := req.URL.Query().Get("definition")
+
+	if mot != "" && definition != "" {
+		dictionnaire[mot] = definition
+	}
 
 	file.Seek(0, 0)
 	file.Truncate(0) 
@@ -63,9 +79,14 @@ func Add(definition Definition, file *os.File) {
 
 }
 
-func Get(mot string, file *os.File) {
+// url: http://localhost:8080/get?mot=go
+func Get(w http.ResponseWriter, req *http.Request) {
+
+	file := GetFile("dictionary.json")
 
 	dictionnaire := GetFileData(file)
+
+	mot := req.URL.Query().Get("mot")
 
 	definition, ok := dictionnaire[mot]
 	if !ok {
@@ -75,7 +96,10 @@ func Get(mot string, file *os.File) {
 	fmt.Printf("Définition pour le mot %s: %s\n", mot, definition)
 }
 
-func List(file *os.File) {
+// url: http://localhost:8080/list
+func List(w http.ResponseWriter, req *http.Request) {
+
+	file := GetFile("dictionary.json")
 
 	dictionnaire := GetFileData(file)
 
@@ -86,9 +110,14 @@ func List(file *os.File) {
 
 }
 
-func Remove(mot string, file *os.File) {
+// url: http://localhost:8080/remove?mot=go
+func Remove(w http.ResponseWriter, req *http.Request) {
+
+	file := GetFile("dictionary.json")
 
 	dictionnaire := GetFileData(file)
+
+	mot := req.URL.Query().Get("mot")
 
 	delete(dictionnaire, mot)
 
@@ -97,5 +126,4 @@ func Remove(mot string, file *os.File) {
 	file.Truncate(0)
 
 	json.NewEncoder(file).Encode(dictionnaire)
-
 }
