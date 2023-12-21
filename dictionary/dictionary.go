@@ -74,6 +74,8 @@ func Add(w http.ResponseWriter, req *http.Request) {
 	
 		if mot != "" && definition != "" {
 			dictionnaire[mot] = definition
+		} else {
+			fmt.Println("mot ou définition manquant")
 		}
 	
 		file.Seek(0, 0)
@@ -100,11 +102,12 @@ func Get(w http.ResponseWriter, req *http.Request) {
 	mot := req.URL.Query().Get("mot")
 
 	definition, ok := dictionnaire[mot]
-	if !ok {
-		log.Fatal("Aucune définition trouvée pour le mot ", mot)
+	if ok {
+		fmt.Printf("Définition pour le mot %s: %s\n", mot, definition)
+	} else {
+		fmt.Println("le mot n'existe pas")
 	}
 
-	fmt.Printf("Définition pour le mot %s: %s\n", mot, definition)
 }
 
 // url: http://localhost:8080/list
