@@ -61,21 +61,32 @@ func GetFileData(file *os.File)  (dictionary) {
 // url: http://localhost:8080/add?mot=go&definition=langage%20de%20programmation%20compil%C3%A9%20cr%C3%A9%C3%A9%20par%20Google
 func Add(w http.ResponseWriter, req *http.Request) {
 
-	file := GetFile("dictionary.json")
+	resultChannel := make(chan string)
 
-	dictionnaire := GetFileData(file)
+	go func()  {
+		
+		file := GetFile("dictionary.json")
+	
+		dictionnaire := GetFileData(file)
+	
+		mot := req.URL.Query().Get("mot")
+		definition := req.URL.Query().Get("definition")
+	
+		if mot != "" && definition != "" {
+			dictionnaire[mot] = definition
+		}
+	
+		file.Seek(0, 0)
+		file.Truncate(0) 
+	
+		json.NewEncoder(file).Encode(dictionnaire)
 
-	mot := req.URL.Query().Get("mot")
-	definition := req.URL.Query().Get("definition")
+		resultChannel <- fmt.Sprintf("Mot '%s' ajouté avec succès!", mot)
+	}()
 
-	if mot != "" && definition != "" {
-		dictionnaire[mot] = definition
-	}
+	result := <-resultChannel
 
-	file.Seek(0, 0)
-	file.Truncate(0) 
-
-	json.NewEncoder(file).Encode(dictionnaire)
+	fmt.Fprintf(w, result)
 
 }
 
